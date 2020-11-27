@@ -1,0 +1,76 @@
+# Common shell functions
+
+set -u
+
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils"
+
+_lsof() {
+  local pid="$1"
+  if ! lsof -p $pid 2>/dev/null; then
+    /bin/ls -l /proc/$pid/fd 2>/dev/null
+  fi
+}
+
+_pidof() {
+  local cmd="$1"
+  if ! pidof "$cmd" 2>/dev/null; then
+     ps -eo pid,ucomm | awk -v comm="$cmd" '$2 == comm { print $1 }'
+  fi
+}
+
+# don't use `kill -0` to check, as normal 
+# user has no permission.
+_is_pid_run() {
+  local pid="$1"
+  if [ -d "/proc/$i" ]; then
+    return 0  # running
+  else
+    return 1  # not running
+  fi
+}
+
+# get port from pid
+_pidport() {
+  local pid="$1"
+  netstat -tnlp | \
+    grep -P "\s+$pid/" | \
+    head -n1 | \
+    perl -ane '
+      my ($port) = $F[3] =~ m/.+:(\d+)/;
+      print $port
+    '
+}
+
+# get pid from port
+_portpid() {
+  local port="$1"
+  netstat -tnlp | \
+    grep -P ":$port\s+" | \
+    head -n1 | \
+    perl -ane '
+      my ($pid) = $F[-1] =~ m|(\d+?)/|;
+      print $pid
+    '
+}
+
+# check host port whether is open or not
+is_host_port_open() {
+  local ip="$1"
+  local port="$2"
+
+  NC_CMD=$(_which nc)
+  if [ -x "$NC_CMD" ]; then
+    if nc -z -v -w 3 $ip $port >/dev/null 2>&1; then
+      return 0
+    fi
+  else
+    # only used in bash shell
+    if echo > /dev/tcp/$ip/$port >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
