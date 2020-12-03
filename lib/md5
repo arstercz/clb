@@ -17,17 +17,22 @@ md5_file() {
 
 md5_check() {
   local file="$1"
+  local is_print_log="$2"
   [ -e "$file" ] || return 1
 
   local res
   DATESIGN=$(date +%FT%T | tr ':' '_')
-  LOGFILE="${WT_WORK_LOGS}/md5check-${DATESIGN}-$(basename $file)"
+  MD5_LOGFILE="${WT_WORK_LOGS}/md5check-${DATESIGN}-$(basename $file)"
 
   # switch to file's dir
   pushd $(dirname "$file") >/dev/null 2>&1
-  md5sum -c "$file" > $LOGFILE 2>&1
+  md5sum -c "$file" > $MD5_LOGFILE 2>&1
   res=$(($? + 0))
   popd >/dev/null 2>&1
+
+  if [[ "$is_print_log" == "yes" && $res -gt 0 ]]; then
+    cat $MD5_LOGFILE | grep -v "OK"
+  fi
 
   return $res
 }

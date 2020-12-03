@@ -36,7 +36,7 @@ if the `file` contains `string1 string2`, the md5 sum is:
 
 ### md5_check
 
-How to use: `md5_check md5_check_file`
+How to use: `md5_check md5_check_file is_print_log`
 
 `md5_check` wrap the `md5sum -c ...` to verify the files md5 sum, the `md5_check_file's` content should be satisfy the output format of the `md5sum file`:
 ```
@@ -54,6 +54,15 @@ if md5_check md5_check_file; then
   log "md5 check ok"
 else
   warn "md5 check error"
+fi
+```
+`md5_check` is also support print failuer log when check fail:
+```
+if md5_check md5_check_file "yes"; then
+  log "md5 check ok"
+else
+  # failuer message automatic print
+  ...
 fi
 ```
 
