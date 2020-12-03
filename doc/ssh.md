@@ -1,7 +1,7 @@
 ## ssh
 
-* [ssh](#ssh)
-* [scp](#scp)
+* [clb_ssh](#clb_ssh)
+* [clb_scp](#clb_scp)
 
 The `ssh` library wrap the `ssh` and `scp` command, and add the following option:
 ```
@@ -13,10 +13,10 @@ BatchMode=yes
 ConnectTimeout=5
 ```
 
-### ssh
+### clb_ssh
 
 How to use: `clb_ssh host command`
 
-### scp
+### clb_scp
 
 How to use: `clb_scp ... host:...`

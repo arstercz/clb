@@ -11,6 +11,7 @@ clb - common library for bash
 * [md5](doc/md5.md)
 * [string](doc/string.md)
 * [array](doc/array.md)
+* [rsync](doc/rsync.md)
 * [ssh](doc/ssh.md)
 * [process](doc/process.md)
 * [mysql](doc/mysql.md)
@@ -25,6 +26,7 @@ issue list:
 
 - [ ] get more process status;
 - [ ] get more system status, such as memory, cpu, ...
+- [x] add rsync common method;
 - [x] add mysql common method;
 - [ ] add redis common method;
 - [ ] add mongodb common method;
