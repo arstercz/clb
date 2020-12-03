@@ -1,7 +1,5 @@
 # Common shell functions
 
-set -u
-
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils"
 
