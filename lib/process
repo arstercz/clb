@@ -17,6 +17,16 @@ _pidof() {
   fi
 }
 
+_pidofpattern() {
+  local pattern="$1"
+  pgrep -f "$pattern" 2>/dev/null
+}
+
+_userofpid() {
+  local pid="$1"
+  ps -o user= -p $pid
+}
+
 # don't use `kill -0` to check, as normal 
 # user has no permission.
 _is_pid_run() {
