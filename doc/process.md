@@ -4,6 +4,8 @@ The `process` library contains the following method to get process info:
 
 * [_lsof](#_lsof)
 * [_pidof](#_pidof)
+* [_pidofpattern](#_pidofpattern)
+* [_userofpid](#_userofpid)
 * [_is_pid_run](#_is_pid_run)
 * [_pidport](#_pidport)
 * [_portpid](#_portpid)
@@ -16,6 +18,14 @@ How to use: `_lsof pid`, get the pid's open file.
 ### _pidof
 
 How to use: `_pidof pid`, get the process name of the pid.
+
+### _pidofpattern
+
+How to use: `_pidofpattern pattern`, get the pid of the matched process.
+
+### _userofpid
+
+How to use: `_userofpid pid`, get the pid's user info.
 
 ### _is_pid_run
 
