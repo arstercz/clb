@@ -7,7 +7,7 @@ The `log` libary contains some log funtions:
 * [error](#error)
 * [die](#die)
 
-*note*: you can disable all log ouput by set the value of the `WT_SILENT` variables.
+**note**: you can disable all log ouput by set the value of the `WT_SILENT` variables.
 
 ### log
 

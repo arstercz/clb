@@ -16,7 +16,7 @@ clb - common library for bash
 * [process](doc/process.md)
 * [mysql](doc/mysql.md)
 
-*note*: all library only test in `Centos/RHEL 6/7`, `Ubuntu 16/18`.
+**note**: all library only test in `Centos/RHEL 6.x/7.x`, `Ubuntu 16.x/18.x`.
 
 ### issue
 

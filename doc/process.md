@@ -67,7 +67,7 @@ the output include the following items if the pid is running:
 -- cpu : 0.0%      # cpu utilization of the pid
 ```
 
-*note*: most of the items are the same as `top -p pid`.
+**note**: most of the items are the same as `top -p pid`.
 
 ### is_host_port_open
 
