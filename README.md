@@ -16,6 +16,8 @@ clb - common library for bash
 * [process](doc/process.md)
 * [mysql](doc/mysql.md)
 
+*note*: all library only test in `Centos/RHEL 6/7`, `Ubuntu 16/18`.
+
 ### issue
 
 issue list:
@@ -24,8 +26,7 @@ issue list:
 
 ### TODO
 
-- [ ] get more process status;
-- [ ] get more system status, such as memory, cpu, ...
+- [x] get more process status;
 - [x] add rsync common method;
 - [x] add mysql common method;
 - [ ] add redis common method;
