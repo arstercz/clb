@@ -78,7 +78,7 @@ get_pid_stat() {
           );
 
           sub size_to_bytes {
-            my $_ = shift;
+            local $_ = shift;
             m/^((?:\d|\.)+)([kMGT])?/i; 
             return $1 * $f{uc($2 || "K")};
           }
@@ -103,16 +103,7 @@ get_pid_stat() {
           }
 
           sub time_to_minutes {
-            my $_ = shift;
-            # top time+ in format: 
-            #   minutes:sendons.hundredths
-            m/^(\d+)/;
-            return ($1 || 0);
-          }
-        };
-
-        chomp;
-            my $_ = shift;
+            local $_ = shift;
             # top time+ in format: 
             #   minutes:sendons.hundredths
             m/^(\d+)/;
