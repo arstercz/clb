@@ -1,0 +1,182 @@
+#!/bin/bash
+# read the log file from last checkpoint
+
+set -e
+[ "$DEBUG" ] && set -x
+
+# import common lib
+for k in /etc/clb/lib/{log,utils,lock,workinit}; do
+  [ -e "$k" ] && . $k
+done
+
+# main function
+main() {
+  for o; do
+    case "${o}" in
+      -f)        shift; OPT_FILE="$1";    shift; ;;
+      -c)        shift; OPT_CHKF="$1";    shift; ;;
+      -r)        shift; OPT_REGP="$1";    shift; ;;
+      -s)        shift; OPT_SIZE="$1";    shift; ;;
+      -l)        shift; WT_LOCKFILE="$1"; shift; ;;
+      -h)        perl -00 -ne 'm/^\s+Usage:/ && print' "$0"; exit 0 ;;
+      -v)        grep -A2 '^=head1 VERSION' "$0" | tail -n1; exit 0 ;;
+      -*)        echo "Unknown option ${o}. Try -h."; exit 1; ;;
+    esac
+  done
+
+  if [ "$OPT_FILE"x == "x" ]; then
+    echo "Error: file option must be specified!"
+    perl -00 -ne 'm/^\s+Usage:/ && print' "$0" && exit 1
+  fi
+
+  trap 'lock_exit' INT TERM EXIT
+  lock_is_ok || {
+    error "only run once at the same time"
+  }
+
+  OPT_CHKF="${OPT_CHKF:-"${WT_WORK_TEMP}/logtail-pos-$(basename $OPT_FILE)"}"
+  OPT_REGP="${OPT_REGP:-"(?!^$)"}"
+  OPT_SIZE="${OPT_SIZE:-"100M"}"
+
+  if [ ! -e $OPT_FILE ]; then
+    warn "the $OPT_FILE is not exist."
+  fi
+
+  # check file
+  SIZENOW=$(stat -c %s $OPT_FILE)
+  CONTENT=""
+  SIZE_THROL=$(size_to_bytes $OPT_SIZE)
+  if [ -e $OPT_CHKF ]; then
+    SIZEOLD=$(get_least_file_size $OPT_CHKF)
+    S_TAIL=$(diff_size $SIZENOW $SIZEOLD)
+    if [[ $S_TAIL -gt 0 ]]; then
+      if [[ $S_TAIL -gt $SIZE_THROL ]]; then
+        warn "the $OPT_FILE diff size is too large, size: $S_TAIL"
+      fi
+      log_output $SIZEOLD $S_TAIL $OPT_FILE $OPT_REGP
+    elif [[ $S_TAIL -eq 0 ]]; then
+      warn "$OPT_FILE is no change"
+    else
+      # OPT_FILE maybe rotate when S_TAIL is less than 0 
+      log_output 0 $SIZENOW $OPT_FILE $OPT_REGP
+    fi
+
+    # update check file
+    set_least_file_size $OPT_CHKF $SIZENOW
+
+  else
+    if [[ $SIZENOW -gt $SIZE_THROL ]]; then
+      warn "$OPT_FILE is too large, size: $SIZENOW"
+    fi
+    log_output 0 $SIZENOW $OPT_FILE $OPT_REGP
+    set_least_file_size $OPT_CHKF $SIZENOW
+  fi
+}
+
+# read check file
+get_least_file_size() {
+  cat $1
+}
+
+# overwrite check point
+set_least_file_size() {
+  echo $2 > $1
+}
+
+# calculate diff file size
+diff_size() {
+  echo `expr $1 - $2`
+}
+
+# print log content
+log_output() {
+  export POSOLD=$1
+  export DIFFSIZE=$2
+  export LOGFILE=$3
+
+  perl -e '
+    open my $fh, "<", $ENV{LOGFILE} 
+      or die "open file error: $!";
+
+    sysseek($fh, $ENV{POSOLD}, 0);
+    my $content;
+    sysread $fh, $content, $ENV{DIFFSIZE};
+    print $content;
+    close $fh;
+  ' | grep -P "$4"
+}
+
+# whether is source file or not
+is_sourced() {
+  [ "${0##*/}" = "clb-logtail" ] || [ "${0##/}" = "bash" -a "$_" = "$0" ]
+}
+
+if is_sourced; then
+  OUTPUT=$(main "$@")
+  echo "${OUTPUT}"
+  exit 0
+fi
+
+# Documentation
+: <<'DOCUMENTATION'
+=pod
+
+=head1 NAME
+
+clb-logtail - extra the log file from last checkpoint
+
+=head1 SYNOPSIS
+
+  Usage: clb-logtail [OPTIONS]
+  OPTION:
+      -f OPT_FILE    the log file.
+      -c OPT_CHKF    where last check point check, default is log-check-$(basename $OPT_FILE)
+      -r OPT_REGP    regexp express, must use the Perl regular expression, the same as grep -P option.
+      -s OPT_SIZE    log file's threshold size to tail, default is 100M. you can use k, M, G, T.
+      -l WT_LOCKFILE the lock file used, default is `/WT_WORK_TEMP/(short_md5).lock` of the command line
+  clb-logtail will tail log file incrementally, OPT_SIZE should not too big.
+
+=head1 DESCRIPTION
+
+Extra the log file from last checkpoint to now and print
+all incremental messages.
+
+=head1 PRIVILEGES
+
+This script executes the following commands:
+
+=over
+
+=item cat
+
+  Read the file you specified or /tmp/ directories.
+
+=back
+
+=over
+
+=item echo
+
+  overwrite check point file.
+
+=back
+
+=over
+
+=item tail
+
+  tail the last diff_size from log file.
+
+=back
+
+=head1 AUTHOR
+
+arstercz@gmail.com
+
+=head1 VERSION
+
+clb-logtail 0.1.0
+
+=cut
+
+DOCUMENTATION

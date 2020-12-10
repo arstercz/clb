@@ -1,0 +1,80 @@
+#!/bin/bash
+# script/command to be run once when the lock is archieved.
+# arstercz@gmail.com
+
+set -e
+[ "$DEBUG" ] && set -x
+
+# import wt function
+for k in /etc/clb/lib/{log,utils,lock,workinit}; do
+  [ -e "$k" ] && . $k
+done
+
+# Run the program
+main() {
+  for o; do
+    case "${o}" in
+      -l)        shift; WT_LOCKFILE="$1"; shift; ;;
+      -h)        perl -00 -ne 'm/^\s+Usage:/ && print' "$0"; exit 0 ;;
+      -v)        grep -A2 '^=head1 VERSION' "$0" | tail -n1; exit 0 ;;
+      -*)        echo "Unknown option ${o}. Try -h."; exit 1; ;;
+    esac
+  done
+
+  if [ "$#" -eq 0 ]; then
+    echo "Usage: wt-lockrun -f lockfile command/script ..."
+    exit 2;
+  fi
+
+  trap 'lock_exit' INT TERM EXIT
+  lock_is_ok || {
+    error "only once can run at one time - $@"
+  }
+
+  "$@"
+}
+
+is_sourced() {
+  [ "${0##*/}" = "clb-lockrun" ] || [ "${0##/}" = "bash" -a "$_" = "$0" ]
+}
+
+if is_sourced; then
+    OUTPUT=$(main "$@")
+    echo "${OUTPUT}"
+    exit 0
+fi
+
+# Documentation
+: <<'DOCUMENTATION'
+=pod
+
+=head1 NAME
+
+clb-lockrun - bash script or command can only run once at any time by using flock.
+
+=head1 SYNOPSIS
+
+  Usage: clb-lockrun [OPTIONS] [command]
+  OPTION:
+     -l the lock file used, default is `/WT_WORK_TEMP/(short_md5).lock` of the command line
+     -v print version message 
+     -h print help message
+  eg:
+     1. run command in session A
+     $ clb-lockrun -l /var/run/lockfile sleep 20
+     2. run command in session B
+     # clb-lockrun -l /var/run/lockfile sleep 20
+     2020_11_23_12_44_13 [error] nnly once can run at one time - sleep
+  note: as use flock, this tool will create and delete lock file when exit.
+
+=head1 AUTHOR
+
+arstercz@gmail.com
+
+=head1 VERSION
+
+clb-lockrun 0.1.0
+
+=cut
+
+DOCUMENTATION

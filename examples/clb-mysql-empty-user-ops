@@ -1,0 +1,182 @@
+#!/bin/sh
+# change or remove mysql empty password user
+
+set -e
+
+for k in /etc/clb/lib/{log,mysql,utils}; do
+  [ -e "$k" ] && . $k
+done
+
+# global variables
+WT_TOOL="ops_mysql-empty-pass"
+
+usage() {
+  cat <<EOF
+
+  Usage: "${WT_TOOL}" [OPTIONS]
+  Options:
+    -H HOST             mysql host, default is 127.0.0.1;
+    -P PORT             mysql port, default is 3306;
+    -u USER             mysql user, default is root
+    -p PASS             mysql password, default is empty;
+    -c CHARSET          mysql character set, default is utf8mb4;
+    -l LIST             only list empty password user;
+    -t TYPE             change or remove empty user, 1: change, 2: remove;
+    -d DRYRUN           dryrun mode, not change or remove user;
+    -N NEWPASS          new password if type is 1, default is complex;
+
+  Option must be given as -o value, not -o=value or -ovalue.
+
+EOF
+
+  exit 0
+}
+
+main() {
+  while getopts ":H:P:u:p:c:lt:d" opt; do
+    case "${opt}" in
+      H)    OPT_HOST=${OPTARG};           ;;
+      P)    OPT_PORT=${OPTARG};           ;;
+      u)    OPT_USER=${OPTARG};           ;;
+      p)    OPT_PASS=${OPTARG};           ;;
+      c)    OPT_CHARSET=${OPT_CHARSET};   ;;
+      l)    OPT_LIST=1;                   ;;
+      t)    OPT_TYPE=${OPTARG};           ;;
+      d)    OPT_DRYRUN=1;                 ;;
+      N)    OPT_NEWPASS=${OPTARG}         ;;
+      h|*)  usage;                        ;;
+    esac
+  done
+  shift "$((OPTIND-1))"
+
+  OPT_TYPE="${OPT_TYPE:-""}"
+  if [[ "${OPT_LIST}" -ne 1 && "${OPT_TYPE}x" == "x" ]]; then
+    die "use -l or -t option"
+  fi
+
+  OPT_HOST="${OPT_HOST:-"127.0.0.1"}"
+  OPT_PORT="${OPT_PORT:-"3306"}"
+  OPT_USER="${OPT_USER:-"root"}"
+  OPT_PASS="${OPT_PASS:-""}"
+  OPT_CHARSET="${OPT_CHARSET:-"utf8mb4"}"
+  OPT_NEWPASS="zGj470kyOJai"
+
+  export PATH=/usr/local/mysql/bin:$PATH
+  if ! mysql_is_alive; then
+    error "mysql is not alive"
+  fi
+
+  # don't change in slave
+  if mysql_is_slave; then
+    error "current mysql is slave, skip..."
+  fi
+
+  declare -a USER_LIST
+
+  version=$(mysql_get_version)
+  USER_LIST=($(mysql_get_empty_user $version))
+
+  [[ ${#USER_LIST[@]} -eq 0 ]] && {
+    echo "[ok] - no empty user"
+    exit 0
+  }
+
+  [[ "${OPT_LIST}" -eq 1 ]] && {
+    log "user list for empty password:"
+    for x in "${USER_LIST[@]}"; do
+      echo "  [$version] - $x"
+    done
+    exit 0
+  } 
+
+  case "${OPT_TYPE}" in
+    1)
+      for x in "${USER_LIST[@]}"; do
+        if mysql_change_empty_user $version $x; then
+          mysql_flush_privilege
+          [ "${OPT_DRYRUN}" ] || log "change for $x ok!"
+        else
+          warn "change for $x error"
+        fi
+      done
+      ;;
+    2)
+      for x in "${USER_LIST[@]}"; do
+        if mysql_remove_empty_user $version $x; then
+          mysql_flush_privilege
+          [ "${OPT_DRYRUN}" ] || log "drop for $x ok!"
+        else
+          warn "drop for $x error"
+        fi
+      done
+      ;;
+    *)
+      warn "unknown type, $OPT_TYPE"
+      usage
+      ;;
+  esac
+}
+
+mysql_get_empty_user() {
+  local version="$1"
+  if (( $(float_compare $version 5.6) > 0)); then
+    mysql_exec_by_cnf "
+      SELECT CONCAT(quote(user), '@', quote(host)) AS user 
+      FROM mysql.user WHERE authentication_string = ''
+    "
+  else
+    mysql_exec_by_cnf "
+      SELECT CONCAT(quote(user), '@', quote(host)) AS user
+      FROM mysql.user WHERE password = ''
+    "
+  fi
+}
+
+mysql_change_empty_user() {
+  local version="$1"
+  local user="$2"
+
+  if (( $(float_compare $version 5.6) > 0)); then
+    if [ "$OPT_DRYRUN" ]; then
+      echo "[dryrun] $version - SET PASSWORD FOR ${user} = '${OPT_NEWPASS}';"
+    else
+      mysql_exec_by_cnf "SET PASSWORD FOR ${user} = '${OPT_NEWPASS}';"
+    fi
+  else
+    if [ "$OPT_DRYRUN" ]; then
+      echo "[dryrun] $version - SET PASSWORD FOR ${user} = PASSWORD('${OPT_NEWPASS}');"
+    else
+      mysql_exec_by_cnf "SET PASSWORD FOR ${user} = PASSWORD('${OPT_NEWPASS}');"
+    fi
+  fi
+}
+
+mysql_remove_empty_user() {
+  local version="$1"
+  local user="$2"
+
+  if (( $(float_compare $version 5.6) > 0)); then
+    if [ "$OPT_DRYRUN" ]; then
+      echo "[dryrun] $version - DROP USER IF EXISTS ${user}"
+    else
+      mysql_exec_by_cnf "DROP USER IF EXISTS ${user}"
+    fi
+  else
+    if [ "$OPT_DRYRUN" ]; then
+      echo "[dryrun] $version - DROP USER ${user}"
+    else
+      mysql_exec_by_cnf "DROP USER ${user}"
+    fi
+  fi
+}
+
+mysql_flush_privilege() {
+  mysql_exec_by_cnf "FLUSH PRIVILEGES"
+}
+
+if [ "${0##*/}" = "$WT_TOOL" ] \
+   || [ "${0##*/}" = "bash" -a "${_:-""}" = "$0" ]; then
+
+  # run 
+  main "${@:-""}"
+fi
