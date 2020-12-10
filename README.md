@@ -5,6 +5,7 @@ clb - common library for bash
 
 * [workinit](doc/workinit.md)
 * [log](doc/log.md)
+* [lock](doc/lock.md)
 * [utils](doc/utils.md)
 * [mktemp](doc/mktemp.md)
 * [email](doc/email.md)
@@ -27,6 +28,7 @@ issue list:
 ### TODO
 
 - [x] get more process status;
+- [x] add lock common method;
 - [x] add rsync common method;
 - [x] add mysql common method;
 - [ ] add redis common method;
