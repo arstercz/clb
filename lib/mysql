@@ -124,7 +124,7 @@ mysqldump_backup() {
 }
 
 mysql_is_alive() {
-  if mysql_exec_by_cnf 'SELECT 1 LIMIT 1'; then
+  if mysql_exec_by_cnf 'SELECT 1 LIMIT 1' >/dev/null; then
     return 0
   else
     warn "${OPT_HOST}:${OPT_PORT} is not alive"
