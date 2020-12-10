@@ -19,6 +19,16 @@ clb - common library for bash
 
 **note**: all library only test in `Centos/RHEL 6.x/7.x`, `Ubuntu 18.04`, `Debian 10`. 
 
+### How to install?
+
+change to the `clb` source directory, and use `make` to install, default is `/etc/clb`, you can set `LIBDIR` to change the default path:
+```
+make install
+
+# or
+make LIBDIR=/tmp/bashlib install
+```
+
 ### basic examples
 
 read more from [examples](examples/).
