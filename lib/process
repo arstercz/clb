@@ -148,7 +148,7 @@ get_pid_stat() {
   fi
 }
 
-# check host port whether is open or not
+# check host tcp port whether is open or not
 is_host_port_open() {
   local ip="$1"
   local port="$2"
@@ -159,12 +159,25 @@ is_host_port_open() {
       return 0
     fi
   else
-    # only used in bash shell
-    if echo > /dev/tcp/$ip/$port >/dev/null 2>&1; then
-      return 0
-    fi
-  fi
+    # based on Perl IO::Socket::INET
+    echo "$ip $port" | perl -MIO::Socket::INET -ne '
+      chomp;
+      my $fail = 0;
+      my ($host, $port) = split(/\s+/, $_);
+      my $socket = IO::Socket::INET->new(
+        PeerAddr => $host,
+        PeerPort => $port,
+        Proto    => tcp,
+        Timeout  => 3,
+      ) || $fail++;
 
-  return 1
+      if ($fail > 0) {
+        print "$host:$port is closed\n";
+        exit $fail;
+      }
+      print "$host:$port is open.\n";
+      exit 0;
+    '
+  fi
 }
 
