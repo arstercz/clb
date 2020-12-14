@@ -47,3 +47,10 @@ issue list:
 - [x] add mysql common method;
 - [ ] add redis common method;
 - [ ] add mongodb common method;
+
+### Reference
+
+[bash-reference-manual](https://www.gnu.org/software/bash/manual/html_node/index.html)  
+[shell-guide](https://google.github.io/styleguide/shellguide.html)  
+[abs-guide](https://tldp.org/LDP/abs/html/)  
+
