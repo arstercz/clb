@@ -44,7 +44,7 @@ How to use: `_portpid port`, get the pid of the port.
 
 How to use: `get_pid_stat pid`, get the status of the pid. such as:
 ```
-. /etc/clb/lib/process
+. /etc/clb/lib/process.sh
 pid="$1"
 
 declare -A pidstats="$(get_pid_stat $pid)"

@@ -1,7 +1,7 @@
 # common use for md5sum
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/md5"
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/md5.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit.sh"
 
 declare -a WT_PARAMS=($0 "$@")
 WT_LOCKFILE=""

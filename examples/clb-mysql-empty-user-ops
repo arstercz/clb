@@ -3,7 +3,7 @@
 
 set -e
 
-for k in /etc/clb/lib/{log,mysql,utils}; do
+for k in /etc/clb/lib/{log,mysql,utils}.sh; do
   [ -e "$k" ] && . $k
 done
 

@@ -15,7 +15,7 @@ TITLE_EMAIL  # email title
 
 set -e
 
-. /etc/clb/lib/email
+. /etc/clb/lib/email.sh
 
 SMTP_EMAIL="10.1.1.10"
 FROM_EMAIL="report@example.com"

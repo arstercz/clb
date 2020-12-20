@@ -1,7 +1,7 @@
 # Common shell functions
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
 
 _lsof() {
   local pid="$1"

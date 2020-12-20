@@ -1,7 +1,7 @@
 # common use for md5sum
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit.sh"
 
 md5_args() {
   md5sum <<<"$@" | awk '{print $1}'

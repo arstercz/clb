@@ -19,7 +19,7 @@ both `clb_rsync_ssh` and `clb_rsync_deamon` support additional options
 
 How to use: `clb_rsync_ssh [rsync option] src dest`, eg:
 ```
-. /etc/clb/lib/rsync
+. /etc/clb/lib/rsync.sh
 
 WT_RSYNC_SSHPORT=22
 clb_rsync_ssh --progress $src $remote_host:$dest
@@ -32,7 +32,7 @@ clb_rsync_ssh -n $src $remote_host:$dest          # rsync dry-run
 
 How to use: `clb_rsync_deamon [rsync option] src dest`, eg:
 ```
-. /etc/clb/lib/rsync
+. /etc/clb/lib/rsync.sh
 
 RSYNC_PASSWORD='password' # rsync user's password
 clb_rsync_deamon --progress $src rsync-user@host::module

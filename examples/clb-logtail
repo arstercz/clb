@@ -5,7 +5,7 @@ set -e
 [ "$DEBUG" ] && set -x
 
 # import common lib
-for k in /etc/clb/lib/{log,utils,lock,workinit}; do
+for k in /etc/clb/lib/{log,utils,lock,workinit}.sh; do
   [ -e "$k" ] && . $k
 done
 

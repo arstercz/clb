@@ -27,8 +27,8 @@ a basic example:
 ```
 #!/bin/sh
 
-. /etc/clb/lib/log
-. /etc/clb/lib/lock
+. /etc/clb/lib/log.sh
+. /etc/clb/lib/lock.sh
 
 # optional set the WT_LOCKFILE
 WT_LOCKFILE="/tmp/lock-test.lock" 

@@ -20,8 +20,8 @@ OPT_PORT=3306
 OPT_USER="root"
 OPT_PASS="xxxxxxxx"
 
-. /etc/clb/lib/log
-. /etc/clb/lib/mysql
+. /etc/clb/lib/log.sh
+. /etc/clb/lib/mysql.sh
 
 if mysql_is_slave; then
   log "$OPT_HOST:$OPT_PORT is slave"

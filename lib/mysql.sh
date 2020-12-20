@@ -1,7 +1,7 @@
 # common use for mysql
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit.sh"
 
 OPT_HOST="${OPT_HOST:-"127.0.0.1"}"
 OPT_PORT="${OPT_PORT:-"3306"}"

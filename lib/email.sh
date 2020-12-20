@@ -1,7 +1,7 @@
 # send by mail command
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
 
 NOTIFY_BY_EMAIL=1
 SMTP_EMAIL="${SMTP:-"127.0.0.1"}"

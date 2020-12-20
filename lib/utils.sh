@@ -1,6 +1,6 @@
 # Common shell functions
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
 
 # utils funtion
 _seq() {
