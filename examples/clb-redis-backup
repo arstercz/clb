@@ -1,0 +1,110 @@
+#!/bin/bash
+# script/command to be run once when the lock is archieved.
+
+set -e -o pipefail
+[ "$DEBUG" ] && set -x
+
+CLB_TOOL="clb-redis-backup"
+
+# import wt function
+for k in /etc/clb/lib/{log,lock,redis,rsync,workinit}.sh; do
+  [ -e "$k" ] && . $k
+done
+
+# Run the program
+main() {
+  for o; do
+    case "${o}" in
+      -H)        shift; OPT_HOST="$1";   shift;  ;;
+      -p)        shift; OPT_PORT="$1";   shift;  ;;
+      -a)        shift; OPT_PASS="$1";   shift;  ;;
+      -h)        perl -00 -ne 'm/^\s+Usage:/ && print' "$0"; exit 0 ;;
+      -v)        grep -A2 '^=head1 VERSION' "$0" | tail -n1; exit 0 ;;
+      -*)        echo "Unknown option ${o}. Try -h."; exit 1; ;;
+    esac
+  done
+
+  # maybe rename config command
+  CMD_CONFIG="config"
+
+  trap 'lock_exit' INT TERM EXIT
+  lock_is_ok || {
+    error "only once can run at one time - $@"
+  }
+
+  if ! redis_is_ok; then
+    error "redis is not ok"
+  fi
+
+  DATESIGN=$(date +%FT%T | tr ':' '_')
+  DSTFILE="${WT_WORK_DATA}/redis-${DATESIGN}-${OPT_HOST}_${OPT_PORT}"
+
+  local rdbfile=$(redis_get_rdbfile)
+  if [[ "$rdbfile" ]]; then
+    DSTFILE+=".rdb"
+    clb_rsync_ssh ${OPT_HOST}:$rdbfile $DSTFILE
+    if (($? == 0)); then
+      log "backup rdb $rdbfile ok"
+    else
+      warn "backup rdb $rdbfile error"
+    fi
+  fi
+
+  if redis_is_aof_enable; then
+    local aoffile=$(redis_get_aoffile)
+    if [[ "$aoffile" ]]; then
+      DSTFILE+=".aof"
+      clb_rsync_ssh ${OPT_HOST}:$aoffile $DSTFILE
+      if (($? == 0)); then
+        log "backup aof $aoffile ok"
+      else
+        warn "backup aof $aoffile error"
+      fi
+    fi
+  fi
+
+  # trigger bgsave if last save time
+  # greater than 2 hours
+  redis_trigger_bgsave 7200
+}
+
+is_sourced() {
+  [ "${0##*/}" = "${CLB_TOOL}" ] || [ "${0##/}" = "bash" -a "$_" = "$0" ]
+}
+
+if is_sourced; then
+    OUTPUT=$(main "$@")
+    echo "${OUTPUT}"
+    exit 0
+fi
+
+# Documentation
+: <<'DOCUMENTATION'
+=pod
+
+=head1 NAME
+
+clb-redis-backup - backup redis rdb and aof file
+
+=head1 SYNOPSIS
+
+  Usage: clb-redis-backup [OPTIONS] [command]
+  OPTION:
+     -H redis host, default is 127.0.0.1
+     -p redis port, default is 6379
+     -a redis password, default is empty string
+     -v print version message 
+     -h print help message
+  clb-redis-backup will backup aof file if enable aof, the same prefix with the rdb file.
+
+=head1 AUTHOR
+
+chenzhe07@gmail.com
+
+=head1 VERSION
+
+clb-redis-backup 0.1.0
+
+=cut
+
+DOCUMENTATION

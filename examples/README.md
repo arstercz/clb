@@ -5,6 +5,7 @@ some examples which use `clb` library:
 * [clb-lockrun](#clb-lockrun)
 * [clb-logtail](#clb-logtail)
 * [clb-mysql-empty-user-ops](#clb-mysql-empty-user-ops)
+* [clb-redis-backup](#clb-redis-backup)
 
 ### clb-lockrun
 
@@ -55,3 +56,24 @@ bash ops_mysql-empty-pass -t 2
 ```
 
 use `-h` option for more usage.
+
+### clb-redis-backup
+
+backup the redis's  rdb and aof file.
+
+#### Usage:
+```
+bash clb-redis-backup -H 10.12.17.25 -p 6379
+2020_12_30_17_18_45 [clb-redis-backup] - [info] /opt/redis6.0/data/dump_6379.rdb
+receiving incremental file list
+dump_6379.rdb
+
+sent 30 bytes  received 624 bytes  1308.00 bytes/sec
+total size is 36731  speedup is 56.16
+2020_12_30_17_18_45 [clb-redis-backup] - [info] backup rdb /opt/redis6.0/data/dump_6379.rdb ok
+receiving incremental file list
+appendonly.aof
+
+sent 30 bytes  received 202943 bytes  405946.00 bytes/sec
+total size is 37503456  speedup is 184.77
+```

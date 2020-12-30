@@ -7,6 +7,8 @@ OPT_PORT      # default is 6379
 OPT_PASS
 ```
 
+**note**: we'll cache redis info result for 60 seconds to avoid connect redis frequently.
+
 such as the following example, read more example from `examples/clb-redis-backup`:
 ```
 #!/bin/bash
@@ -17,6 +19,9 @@ such as the following example, read more example from `examples/clb-redis-backup
 OPT_HOST="10.1.1.10"
 OPT_PORT=6379
 OPT_PASS="xxxxxxxx"
+
+# some command maybe renamed
+CMD_CONFIG="config"
 
 
 if ! redis_is_ok; then
