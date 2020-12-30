@@ -5,7 +5,7 @@
 set -e
 [ "$DEBUG" ] && set -x
 
-# import wt function
+# import clb function
 for k in /etc/clb/lib/{log,utils,lock,workinit}.sh; do
   [ -e "$k" ] && . $k
 done
@@ -22,7 +22,7 @@ main() {
   done
 
   if [ "$#" -eq 0 ]; then
-    echo "Usage: wt-lockrun -f lockfile command/script ..."
+    echo "Usage: clb-lockrun -f lockfile command/script ..."
     exit 2;
   fi
 
