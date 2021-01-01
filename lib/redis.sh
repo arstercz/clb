@@ -90,9 +90,16 @@ _redis_common_info() {
     status=1
   fi
 
-  if ! _redis_dbfile >> "${REDIS_STATLOG}" 2>${REDIS_ERRLOG}; then
+  if ! _redis_dbfile >> "${REDIS_STATLOG}" 2>>${REDIS_ERRLOG}; then
     error "get dbfile error"
     status=2
+  fi
+
+  if redis_is_cluster; then
+    if ! redis_exec "cluster info" >> "${REDIS_STATLOG}" 2>>${REDIS_ERRLOG}; then
+      warn "get cluster info error"
+      status=3
+    fi
   fi
 
   return $status
@@ -133,7 +140,7 @@ redis_is_slave() {
 
 redis_is_slave_ok() {
   if redis_is_slave; then
-    SUP=($redis_item_get "master_link_status")
+    SUP=$(redis_item_get "master_link_status")
     [[ "$SUP" == "up" ]]
   fi
 
@@ -143,6 +150,17 @@ redis_is_slave_ok() {
 redis_is_cluster() {
   local is_cluster=$(redis_item_get "cluster_enabled")
   (($is_cluster == 1))
+}
+
+redis_is_cluster_ok() {
+  if redis_is_cluster; then
+    CSTATE=$(redis_item_get "cluster_state")
+    CSFAIL=$(redis_item_get "cluster_slots_fail")
+    [[ "$CSTATE" == "ok" && "$CSFAIL" -eq 0 ]]
+  else
+    warn "redis ${OPT_HOST}:${OPT_PORT} is not cluster"
+    return 1
+  fi
 }
 
 # is redis in loading

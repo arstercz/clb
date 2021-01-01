@@ -43,6 +43,7 @@ The function list:
 * [redis_is_slave](#redis_is_slave)
 * [redis_is_slave_ok](#redis_is_slave_ok)
 * [redis_is_cluster](#redis_is_cluster)
+* [redis_is_cluster_ok](#redis_is_cluster_ok)
 * [redis_is_in_loading](#redis_is_in_loading)
 * [redis_is_in_bgsave](#redis_is_in_bgsave)
 * [redis_trigger_bgsave](#redis_trigger_bgsave)
@@ -89,6 +90,10 @@ check whether the redis slave is ok or not.
 ### redis_is_cluster
 
 check whether the redis is cluster or not.
+
+### redis_is_cluster_ok
+
+check whether the redis cluster is ok or not.
 
 ### redis_is_in_loading
 
