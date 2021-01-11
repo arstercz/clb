@@ -55,11 +55,8 @@ mysqldump_backup() {
     VAL_TRANSACTION=1
   fi
 
-  # lock-for-backup at least 5.6
-  local version=$(mysql_get_version)
-  if [[ ( ${version%.*} -eq 5 \
-          && ${version#*.} -ge 5 ) \
-       || ${version%.*} -gt 5 ]]; then
+  # lock-for-backup, mostly support by percona server
+  if mysqldump --lock-for-backups --version >/dev/null 2>&1; then
     VAL_LOCKBACKUP=1
   fi
 
