@@ -1,4 +1,5 @@
 # common use for mysql
+# chenzhe0200<chenzhe0200@pwrd.com>
 
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit.sh"
@@ -8,16 +9,22 @@ OPT_PORT="${OPT_PORT:-"3306"}"
 OPT_USER="${OPT_USER:-"root"}"
 OPT_CHARSET="${OPT_CHARSET:-"utf8mb4"}"
 
+DIRECT_DEV="/dev/null"
+
 mysql_exec() {
+  [ "$DEBUG" ] && DIRECT_DEV="/dev/stderr"
+
   mysql ${OPT_DEFT:+--defaults-file="${OPT_DEFT}"} \
         ${OPT_HOST:+-h"${OPT_HOST}"} ${OPT_PORT:+-P"${OPT_PORT}"} \
         ${OPT_USER:+-u"${OPT_USER}"} ${OPT_PASS:+-p"${OPT_PASS}"} \
         ${OPT_SOCK:+-S"${OPT_SOCK}"} \
         ${OPT_CHARSET:+"--default-character-set=${OPT_CHARSET}"}\
-        --connect-timeout=3 -ss -e "$1" 2>/dev/null
+        --connect-timeout=3 -ss -e "$1" 2>$DIRECT_DEV
 }
 
 mysql_exec_by_cnf() {
+  [ "$DEBUG" ] && DIRECT_DEV="/dev/stderr"
+
   OPT_PASS="${OPT_PASS:-""}"
 
   set -o pipefail
@@ -33,7 +40,7 @@ mysql_exec_by_cnf() {
       mysql ${OPT_DEFT:+--defaults-file="${OPT_DEFT}"} \
             "--defaults-extra-file=/dev/stdin" \
             ${OPT_SOCK:+-S"${OPT_SOCK}"} \
-            --connect-timeout=3 -ss -e "$1" 2>/dev/null
+            --connect-timeout=3 -ss -e "$1" 2>$DIRECT_DEV
 }
 
 mysqldump_backup() {
