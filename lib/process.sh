@@ -31,6 +31,7 @@ _userofpid() {
 # user has no permission.
 _is_pid_run() {
   local pid="$1"
+  [ -z "$pid" ] && return 1
   if [ -d "/proc/$pid" ]; then
     return 0  # running
   else

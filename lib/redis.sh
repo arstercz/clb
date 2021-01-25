@@ -48,7 +48,7 @@ _redis_dbfile() {
   local dbfile=""
 
   local dir=$(redis_exec "${CMD_CONFIG} get dir")
-  [[ "$dir"x == "x" ]] && return 1
+  [[ -z "$dir" ]] && return 1
 
   local file=$(redis_exec "${CMD_CONFIG} get dbfilename")
   if (($? == 0)); then
@@ -83,8 +83,7 @@ _redis_dbfile() {
 
 _redis_common_info() {
   local status=0
-  DATESIGN=$(date +%FT%T | tr ':' '_')
-  REDIS_ERRLOG="${WT_WORK_LOGS}/redis_${OPT_HOST}-${OPT_PORT}_${DATESIGN}.log"
+  REDIS_ERRLOG="${WT_WORK_LOGS}/redis_${OPT_HOST}-${OPT_PORT}.error.log"
   if ! redis_exec "info all" > "${REDIS_STATLOG}" 2>${REDIS_ERRLOG}; then
     error "get redis info all error"
     status=1
@@ -142,9 +141,9 @@ redis_is_slave_ok() {
   if redis_is_slave; then
     SUP=$(redis_item_get "master_link_status")
     [[ "$SUP" == "up" ]]
+  else
+    return 1
   fi
-
-  return 1
 }
 
 redis_is_cluster() {
