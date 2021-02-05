@@ -144,6 +144,7 @@ _mysql_slave_check() {
       $status{io_running}  = $1 if m/Slave_IO_Running: (\w+)$/i;
       $status{sql_running} = $1 if m/Slave_SQL_Running: (\w+)$/i;
       $status{behind_delay}= $1 if m/Seconds_Behind_Master: (\d+)$/i;
+      $status{last_sql_errno} = $1 if m/Last_SQL_Errno: (\d+)$/i;
 
       END {
         if (! defined $status{master_host}) {
@@ -156,11 +157,16 @@ _mysql_slave_check() {
                print "0"; # slave is ok
              }
              else {
-               print "1"; # slave delay
+               if ($status{last_sql_error} == 0) {
+                 print "1"; # slave delay
+               }
+               else {
+                 print "3"; # sql thread errors
+               }
              }
           }
           else {
-             print "2"; # slave is error
+             print "4"; # slave is error
           }
         }
       }
