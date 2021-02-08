@@ -87,7 +87,6 @@ mysqldump_backup() {
   DSTFILE="${WT_WORK_DATA}/mysqldump-${DATESIGN}-${OPT_HOST}_${OPT_PORT}"
   DSTFILE="${DSTFILE}${VAL_DATABASE:+"_${DB_NAME}"}${VAL_TABLES:+"_${TB_NAME}"}.sql"
 
-  local pid="$$"
   local error_log="${WT_WORK_LOGS}/mysqldump-${DATESIGN}-${OPT_HOST}_${OPT_PORT}.log"
 
   set -o pipefail
