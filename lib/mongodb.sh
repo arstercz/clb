@@ -68,14 +68,12 @@ mongo_role_name() {
 }
 
 mongo_get_repl_lag() {
-  local role="$1"
+  local role="${1:-""}"
   if [[ "$role" == "slave" ]]; then
     mongo_exec "db.printReplicationInfo()" | \
        grep 'behind the freshest' | \
        perl -ne 'print $1 if /(\d+?)\ssecs\s/i'
-  fi
-
-  if [[ "$role" == "secondary" ]]; then
+  elif [[ "$role" == "secondary" ]]; then
     local self_host=$(mongo_exec "rs.status().members.forEach(function(op) { if (op.self == true) {printjson(op.name)} })")
     export SELF_HOST=$self_host
     mongo_exec "db.printSlaveReplicationInfo()" | \
@@ -89,6 +87,8 @@ mongo_get_repl_lag() {
          print $1 if /(\d+)\ssecs\s.+behind the/ && $match == 1; 
          $match = 1 if /$host/
        '
+  else
+    printf "%d" 99999
   fi
 
 }
@@ -99,8 +99,7 @@ mongo_is_repl() {
 }
 
 mongo_is_repl_ok() {
-  local threshold="$1"
-  threshold="${threshold:-150}" # default is 150 seconds
+  local threshold="${1:-150}" # default is 150 seconds
   local role=$(mongo_role_name)
 
   mongo_is_repl || return 1 # not repl
@@ -118,8 +117,7 @@ mongo_is_slave() {
 }
 
 mongo_is_slave_ok() {
-  local threshold="$1"
-  threshold="${threshold:-150}" # default is 150 seconds
+  local threshold="${1:-150}"  # default is 150 seconds
 
   mongo_is_slave || return 1 # not slave
 
@@ -137,8 +135,7 @@ mongo_is_secondary() {
 }
 
 mongo_is_secondary_ok() {
-  local threshold="$1"
-  threshold="${threshold:-150}" # default is 150 seconds
+  local threshold="${1:-150}"  # default is 150 seconds
 
   mongo_is_secondary || return 1 # not secondary
 
@@ -151,8 +148,7 @@ mongo_is_secondary_ok() {
 }
 
 mongo_has_long_running() {
-  local threshold="$1"
-  threshold="${threshold:-10}"
+  local threshold="${1:-10}"
   local num=$(mongo_exec "db.currentOp().inprog.forEach(function(op) { if (op.secs_running > $threshold && op.ns != 'local.oplog.\$main') printjson(op.ns)})" | wc -l)
 
   if (($num >= 3)); then
@@ -163,9 +159,8 @@ mongo_has_long_running() {
 }
 
 mongo_has_lock() {
-  local threshold="$1"
+  local threshold="${1:-3}"
   local num=$(mongo_exec "db.currentOp({'waitingForLock': true}).inprog.forEach(function(op) { printjson(op.ns) })" | wc -l)
-  threshold="${threshold:-3}"
 
   if (($num >= $threshold)); then
     return 0

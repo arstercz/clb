@@ -2,11 +2,11 @@
 
 The `mongodb` libary contains some `common method`, custom scripts shoule be set the following variables before invoke method:
 ```
-OPT_HOST      # 默认 127.0.0.1
-OPT_PORT      # 默认 27017
-OPT_USER      # 可选
-OPT_PASS      # 可选
-OPT_AUTHDB    # 可选, 对应 mongo 命令行参数 --authenticationDatabase
+OPT_HOST      # default is 127.0.0.1
+OPT_PORT      # default is 27017
+OPT_USER      # optional
+OPT_PASS      # optional
+OPT_AUTHDB    # optional, response to mongo option --authenticationDatabase
 ```
 
 such as the following example:
@@ -15,9 +15,9 @@ such as the following example:
 
 OPT_HOST="10.1.1.10"
 OPT_PORT=27017
-OPT_USER="root"      # 可选
-OPT_PASS="xxxxxxxx"  # 可选
-OPT_AUTHDB="admin"   # 可选
+OPT_USER="root"      # optional
+OPT_PASS="xxxxxxxx"  # optional
+OPT_AUTHDB="admin"   # optional
 
 . /etc/clb/lib/log.sh
 . /etc/clb/lib/mongodb.sh
