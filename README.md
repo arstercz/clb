@@ -16,6 +16,7 @@ clb - common library for bash
 * [ssh](doc/ssh.md)
 * [process](doc/process.md)
 * [mysql](doc/mysql.md)
+* [mongodb](doc/mongodb.md)
 * [redis](doc/redis.md)
 
 **note**: all library only test in `Centos/RHEL 6.x/7.x`, `Ubuntu 18.04`, `Debian 10`. 
@@ -47,7 +48,7 @@ issue list:
 - [x] add rsync common method;
 - [x] add mysql common method;
 - [x] add redis common method;
-- [ ] add mongodb common method;
+- [x] add mongodb common method;
 
 ### Reference
 
