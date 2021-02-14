@@ -3,7 +3,6 @@
 WT_SSHPORT="${WT_SSHPORT:-"22"}"
 
 clb_ssh() {
-  _is_ssh_ok && WT_CONPERSIST=1
   ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 \
       -o StrictHostKeyChecking=no -o PasswordAuthentication=no \
       -o BatchMode=yes -o ConnectTimeout=5 \
