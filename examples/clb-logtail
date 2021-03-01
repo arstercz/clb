@@ -67,15 +67,20 @@ main() {
   else
     if [[ $SIZENOW -gt $SIZE_THROL ]]; then
       warn "$OPT_FILE is too large, size: $SIZENOW"
+    else
+      log_output 0 $SIZENOW $OPT_FILE $OPT_REGP
     fi
-    log_output 0 $SIZENOW $OPT_FILE $OPT_REGP
     set_least_file_size $OPT_CHKF $SIZENOW
   fi
 }
 
 # read check file
 get_least_file_size() {
-  cat $1
+  [[ -e "$1" ]] && {
+    cat $1
+  } || {
+    echo 0
+  }
 }
 
 # overwrite check point
@@ -103,7 +108,7 @@ log_output() {
     sysread $fh, $content, $ENV{DIFFSIZE};
     print $content;
     close $fh;
-  ' | grep -P "$4"
+  ' | LC_CTYPE=en_US.utf8 grep -i -P "$4"
 }
 
 # whether is source file or not
