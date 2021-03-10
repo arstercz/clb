@@ -10,6 +10,7 @@ OPT_USER="${OPT_USER:-"root"}"
 OPT_CHARSET="${OPT_CHARSET:-"utf8mb4"}"
 
 DIRECT_DEV="/dev/null"
+DEBUG="${DEBUG:-""}"
 
 mysql_exec() {
   [ "$DEBUG" ] && DIRECT_DEV="/dev/stderr"

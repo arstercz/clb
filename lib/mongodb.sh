@@ -6,6 +6,7 @@
 OPT_HOST="${OPT_HOST:-"127.0.0.1"}"
 OPT_PORT="${OPT_PORT:-"27017"}"
 DIRECT_DEV="/dev/null"
+DEBUG="${DEBUG:-""}"
 
 mongo_exec() {
   [ "$DEBUG" ] && DIRECT_DEV="/dev/stderr"
