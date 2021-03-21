@@ -15,5 +15,5 @@ for dir in ${!WT_WORK*}; do
     exit 1
   }
 
-  [[ -d "${!dir}" ]] || mkdir -p "${!dir}"
+  [[ -d "${!dir}" ]] || mkdir -m 0777 -p "${!dir}"
 done
