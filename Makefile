@@ -3,6 +3,6 @@ INSTALLDIR=$(LIBDIR)/lib
 
 install_lib:
 	mkdir -p $(INSTALLDIR)
-	cp -r lib/* $(INSTALLDIR)
+	cp -f -r lib/* $(INSTALLDIR)
 
 install: install_lib
