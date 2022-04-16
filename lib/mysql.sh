@@ -1,5 +1,4 @@
 # common use for mysql
-# chenzhe0200<chenzhe0200@pwrd.com>
 
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/log.sh"
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/workinit.sh"

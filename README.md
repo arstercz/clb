@@ -41,15 +41,6 @@ issue list:
 
 * [issue-list](doc/issue-list.md)  
 
-### TODO
-
-- [x] get more process status;
-- [x] add lock common method;
-- [x] add rsync common method;
-- [x] add mysql common method;
-- [x] add redis common method;
-- [x] add mongodb common method;
-
 ### Reference
 
 [bash-reference-manual](https://www.gnu.org/software/bash/manual/html_node/index.html)  
